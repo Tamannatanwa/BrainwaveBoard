@@ -10,8 +10,8 @@ import AddIdea from "../pages/AddEditIdea";
 export default function AppRoutes() {
     return (
         <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/" element={<MainLayout showFooter={false}><Login /></MainLayout>} />
+            <Route path="/signup" element={<MainLayout showFooter={false}><SignupPage /></MainLayout>} />
 
             <Route
                 path="/home"
@@ -31,14 +31,10 @@ export default function AppRoutes() {
             />
             <Route
                 path="/dashboard"
-                element={
-                    <MainLayout>
-                        <Dashboard />
-                    </MainLayout>
-                }
+                element={<Dashboard />}
             />
 
-            <Route path="/add-idea" element={<MainLayout><AddIdea /></MainLayout>} />
+            <Route path="/add-idea" element={<MainLayout showFooter={false}><AddIdea /></MainLayout>} />
         </Routes>
     );
 }
