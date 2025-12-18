@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { use } from 'react';
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
@@ -9,10 +9,13 @@ import Lightbulb from "@mui/icons-material/Lightbulb";
 import Person from "@mui/icons-material/Person";
 import TrendingUp from "@mui/icons-material/TrendingUp";
 import ArrowForward from "@mui/icons-material/ArrowForward";
+import { useNavigate } from 'react-router-dom';
 
 const HomeScreen = () => {
+  const navigate  = useNavigate();
   const handleGetStarted = () => {
-    console.log('Navigate to signup');
+    navigate('/signup');
+    
   };
 
   return (
