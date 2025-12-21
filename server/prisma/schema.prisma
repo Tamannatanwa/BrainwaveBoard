@@ -60,3 +60,4 @@ model Like {
   @@unique([ideaId, userId])
 }
 
+
