@@ -6,18 +6,37 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+import Alert from "@mui/material/Alert";
 import Lightbulb from "@mui/icons-material/Lightbulb";
 import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const handleLogin = () => {
-    login({ email });
-    navigate('/dashboard');
+  const handleLogin = async (e) => {
+    e?.preventDefault();
+    setError('');
+    setLoading(true);
+
+    if (!email || !password) {
+      setError('Please fill in all fields');
+      setLoading(false);
+      return;
+    }
+
+    const result = await login({ email, password });
+    
+    if (result.success) {
+      navigate('/dashboard');
+    } else {
+      setError(result.error || 'Login failed. Please try again.');
+    }
+    setLoading(false);
   };
 
   return (
@@ -50,33 +69,44 @@ const Login = () => {
             <Typography variant="h4" sx={{ fontWeight: 700, mb: 3, textAlign: 'center' }}>
               Login
             </Typography>
-            <TextField 
-              fullWidth 
-              label="Email" 
-              variant="outlined" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              sx={{ mb: 2 }}
-            />
-            <TextField 
-              fullWidth 
-              label="Password" 
-              type="password" 
-              variant="outlined"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              sx={{ mb: 3 }}
-            />
-            <Button 
-              fullWidth 
-              variant="contained" 
-              color="primary"
-              size="large"
-              onClick={handleLogin}
-              sx={{ mb: 2, py: 1.5 }}
-            >
-              Login
-            </Button>
+            {error && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {error}
+              </Alert>
+            )}
+            <Box component="form" onSubmit={handleLogin}>
+              <TextField 
+                fullWidth 
+                label="Email" 
+                type="email"
+                variant="outlined" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                sx={{ mb: 2 }}
+              />
+              <TextField 
+                fullWidth 
+                label="Password" 
+                type="password" 
+                variant="outlined"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                sx={{ mb: 3 }}
+              />
+              <Button 
+                fullWidth 
+                variant="contained" 
+                color="primary"
+                size="large"
+                type="submit"
+                disabled={loading}
+                sx={{ mb: 2, py: 1.5 }}
+              >
+                {loading ? 'Logging in...' : 'Login'}
+              </Button>
+            </Box>
             <Typography variant="body2" align="center" sx={{ color: 'text.secondary' }}>
               Don't have an account?{' '}
               <Typography component="span" sx={{ color: 'secondary.main', cursor: 'pointer', fontWeight: 600 }} onClick={() => navigate('/signup')}>

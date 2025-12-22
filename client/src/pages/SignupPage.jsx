@@ -6,6 +6,7 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+import Alert from "@mui/material/Alert";
 import Lightbulb from "@mui/icons-material/Lightbulb";
 import { useAuth } from '../context/AuthContext';
 
@@ -14,12 +15,39 @@ const SignupPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { register } = useAuth();
 
-  const handleSignup = () => {
-    login({ name, email });
-    navigate('/dashboard');
+  const handleSignup = async (e) => {
+    e?.preventDefault();
+    setError('');
+
+    if (!name || !email || !password || !confirmPassword) {
+      setError('Please fill in all fields');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
+    setLoading(true);
+    const result = await register({ name, email, password });
+    
+    if (result.success) {
+      navigate('/dashboard');
+    } else {
+      setError(result.error || 'Registration failed. Please try again.');
+    }
+    setLoading(false);
   };
 
   return (
@@ -52,50 +80,63 @@ const SignupPage = () => {
             <Typography variant="h4" sx={{ fontWeight: 700, mb: 3, textAlign: 'center' }}>
               Sign Up
             </Typography>
-            <TextField 
-              fullWidth 
-              label="Full Name" 
-              variant="outlined" 
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              sx={{ mb: 2 }}
-            />
-            <TextField 
-              fullWidth 
-              label="Email" 
-              variant="outlined" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              sx={{ mb: 2 }}
-            />
-            <TextField 
-              fullWidth 
-              label="Password" 
-              type="password" 
-              variant="outlined"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              sx={{ mb: 2 }}
-            />
-            <TextField 
-              fullWidth 
-              label="Confirm Password" 
-              type="password" 
-              variant="outlined"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              sx={{ mb: 3 }}
-            />
-            <Button 
-              fullWidth 
-              variant="contained" 
-              color="secondary"
-              size="large"
-              onClick={handleSignup}
-              sx={{ mb: 2, py: 1.5 }}
-            >
-              Sign Up
-            </Button>
+            {error && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {error}
+              </Alert>
+            )}
+            <Box component="form" onSubmit={handleSignup}>
+              <TextField 
+                fullWidth 
+                label="Full Name" 
+                variant="outlined" 
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                sx={{ mb: 2 }}
+              />
+              <TextField 
+                fullWidth 
+                label="Email" 
+                type="email"
+                variant="outlined" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                sx={{ mb: 2 }}
+              />
+              <TextField 
+                fullWidth 
+                label="Password" 
+                type="password" 
+                variant="outlined"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                sx={{ mb: 2 }}
+              />
+              <TextField 
+                fullWidth 
+                label="Confirm Password" 
+                type="password" 
+                variant="outlined"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                sx={{ mb: 3 }}
+              />
+              <Button 
+                fullWidth 
+                variant="contained" 
+                color="secondary"
+                size="large"
+                type="submit"
+                disabled={loading}
+                sx={{ mb: 2, py: 1.5 }}
+              >
+                {loading ? 'Signing up...' : 'Sign Up'}
+              </Button>
+            </Box>
             <Typography variant="body2" align="center" sx={{ color: 'text.secondary' }}>
               Already have an account?{' '}
               <Typography component="span" sx={{ color: 'primary.main', cursor: 'pointer', fontWeight: 600 }} onClick={() => navigate('/')}>
